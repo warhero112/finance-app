@@ -25,7 +25,38 @@ All core features have been implemented and tested:
 - Settings persistence with immediate UI updates
 - End-to-end tested with Playwright automation
 
-**Recent Completion (October 16, 2025):**
+**Recent Updates:**
+
+**October 23, 2025 - Authentication System Implemented:**
+- ✅ **Email/Password Authentication**: Full authentication system with secure login and registration
+- ✅ **Passport.js Integration**: LocalStrategy with scrypt password hashing and per-user salts
+- ✅ **Session Management**: Express-session with in-memory store (memorystore)
+- ✅ **Protected Routes**: All financial data endpoints require authentication
+- ✅ **User Isolation**: Each user's data is completely isolated (transactions, goals, AI messages)
+- ✅ **Beautiful Auth UI**: Two-column login/registration page with gradient hero section
+- ✅ **Logout Functionality**: Sign out button in Settings with automatic redirect
+- ✅ Installed passport, passport-local, express-session, and memorystore packages
+
+**October 23, 2025 - Major Feature Enhancements:**
+- ✅ **UI Improvements**: Centered quick-add button in bottom navigation for better UX
+- ✅ **Smart Number Formatting**: Added compact number display (100k, 5.5m, etc.) for calendar view
+- ✅ **AI Model Upgrade**: Replaced Anthropic Claude with Hugging Face Deepseek-R1 for financial advisor
+- ✅ **OCR Integration**: Added bill/receipt scanning with OCR.space API + AI parsing
+- ✅ **Calendar Enhancement**: Transaction details expand on date selection (similar to AI Advisor)
+- ✅ Installed @huggingface/inference and ocr-space-api-wrapper packages
+- ✅ New API endpoint: /api/ocr/scan-bill for extracting transaction data from images
+
+**October 23, 2025 - Replit Environment Setup Completed:**
+- ✅ Imported from GitHub and configured for Replit
+- ✅ Installed Node.js 20 and all npm dependencies (507 packages)
+- ✅ Created .gitignore file for Node.js project
+- ✅ Fixed drizzle.config.ts to work without mandatory database
+- ✅ Configured development workflow on port 5000
+- ✅ Verified frontend and backend integration working correctly
+- ✅ Configured deployment settings (autoscale with build/start scripts)
+- ✅ App running successfully with in-memory storage
+
+**Previous Completion (October 16, 2025):**
 - Backend storage layer with comprehensive interface
 - RESTful API routes for all resources
 - Frontend integration with React Query for state management
@@ -35,6 +66,38 @@ All core features have been implemented and tested:
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Authentication System
+
+**Security Model:**
+- Username/password authentication using Passport.js LocalStrategy
+- Passwords hashed with Node.js scrypt algorithm (64-byte hash with 16-byte salt)
+- Session-based authentication with express-session
+- Secure password comparison using timingSafeEqual to prevent timing attacks
+- SESSION_SECRET environment variable for session encryption
+
+**Authentication Flow:**
+1. User registers → Password hashed → User created → Automatic login
+2. User logs in → Credentials verified → Session created → Redirect to app
+3. User logs out → Session destroyed → Redirect to login page
+4. Unauthenticated access → Automatic redirect to /auth page
+
+**Protected Resources:**
+- All transaction, goal, and AI message endpoints require authentication
+- Each user's data is completely isolated by userId
+- API returns 401 Unauthorized for unauthenticated requests
+
+**User Interface:**
+- `/auth` - Beautiful two-column login/registration page
+- Login form with username and password
+- Registration form with username, password, name, and email
+- Toggle between login and registration
+- Settings page includes "Sign Out" button
+
+**Storage:**
+- In-memory session store (memorystore) for development
+- User credentials stored with hashed passwords in MemStorage
+- Production ready for PostgreSQL session store (connect-pg-simple)
 
 ## System Architecture
 
@@ -98,9 +161,10 @@ Preferred communication style: Simple, everyday language.
 ### AI Integration
 
 **AI Provider:**
-- Anthropic Claude API for conversational financial advice
-- Optional integration (requires ANTHROPIC_API_KEY environment variable)
+- Hugging Face Deepseek-R1-Distill-Qwen-32B for conversational financial advice
+- Optional integration (requires HUGGING_FACE_API_KEY environment variable)
 - Graceful degradation when API key is not configured
+- Previously used Anthropic Claude (upgraded October 23, 2025)
 
 **AI Features:**
 - Contextual financial advice based on user transaction history
@@ -108,11 +172,14 @@ Preferred communication style: Simple, everyday language.
 - Budget optimization suggestions
 - Goal adjustment recommendations
 - Natural language conversation interface
+- **NEW**: OCR-powered bill scanning with AI text extraction and parsing
 
 **Implementation Approach:**
 - Message history stored per user for context retention
 - Role-based messages (user/assistant) for conversation threading
 - Quick suggestion prompts to guide user interactions
+- OCR.space API for text extraction from bill/receipt images
+- Deepseek AI for parsing extracted text into structured transaction data
 
 ### Development Workflow
 
@@ -142,8 +209,10 @@ Preferred communication style: Simple, everyday language.
 ### Third-Party Services
 
 **AI Services:**
-- Anthropic API (@anthropic-ai/sdk) - Claude AI for financial advisory features
-- Requires ANTHROPIC_API_KEY environment variable
+- Hugging Face Inference API (@huggingface/inference) - Deepseek-R1 for financial advisory
+- Requires HUGGING_FACE_API_KEY environment variable
+- OCR.space API - Text extraction from bills/receipts
+- Optional: OCR_SPACE_API_KEY environment variable (free tier available with 'helloworld' key)
 
 ### Database & ORM
 
