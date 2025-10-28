@@ -1,11 +1,39 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./supabase-storage";
 import { insertTransactionSchema, insertGoalSchema, insertAiMessageSchema } from "@shared/schema";
 import Anthropic from "@anthropic-ai/sdk";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const DEMO_USER_ID = "demo-user-001";
+  const DEMO_USER_ID = "37f30cf0-ead3-49fb-af66-40450d54e0e8";
+
+  const initDemoUser = async () => {
+    try {
+      let user = await storage.getUser(DEMO_USER_ID);
+
+      if (!user) {
+        user = await storage.createUser({
+          name: "FinTrack User",
+          email: "user@fintrack.app",
+          currency: "USD",
+          language: "en"
+        });
+
+        await storage.createAiMessage({
+          userId: DEMO_USER_ID,
+          role: "assistant",
+          content: "Hi! I'm your AI financial advisor. I can help you analyze your spending, set better goals, optimize your budget, and answer any financial questions. What would you like to know about your finances?"
+        });
+      }
+
+      return user;
+    } catch (error) {
+      console.error("Failed to initialize demo user:", error);
+      throw error;
+    }
+  };
+
+  await initDemoUser();
 
   // Initialize Anthropic client
   const anthropic = process.env.ANTHROPIC_API_KEY 
